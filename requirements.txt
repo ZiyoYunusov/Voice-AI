@@ -1,0 +1,6 @@
+pipecat-ai[silero,azure,google,anthropic,runner,webrtc]==1.11.0
+python-dotenv>=1.0.1,<2
+loguru>=0.7.2,<1
+httpx>=0.28.0,<1
+pytest>=8.3.0,<9
+pytest-asyncio>=0.24.0,<1

@@ -1,0 +1,17 @@
+[
+  {"id": "plov", "name": "Ош (плов)", "name_uz": "Osh (palov)", "category": "main", "price": 35000, "description": "Традиционный узбекский плов с бараниной и морковью"},
+  {"id": "lagman", "name": "Лагман", "name_uz": "Lag'mon", "category": "main", "price": 28000, "description": "Тянутая лапша с говядиной и овощами в остром соусе"},
+  {"id": "manti", "name": "Манты", "name_uz": "Manti", "category": "main", "price": 30000, "description": "Манты на пару с бараниной и тыквой, порция 5 штук"},
+  {"id": "shashlik_lamb", "name": "Шашлык из баранины", "name_uz": "Qo'y go'shtidan shashlik", "category": "main", "price": 42000, "description": "Шашлык из баранины на углях, порция 2 шампура"},
+  {"id": "shashlik_chicken", "name": "Шашлык из курицы", "name_uz": "Tovuq go'shtidan shashlik", "category": "main", "price": 32000, "description": "Куриный шашлык на углях, порция 2 шампура"},
+  {"id": "somsa", "name": "Самса", "name_uz": "Somsa", "category": "snack", "price": 12000, "description": "Самса с мясом из тандыра, 1 штука"},
+  {"id": "shurpa", "name": "Шурпа", "name_uz": "Sho'rva", "category": "soup", "price": 24000, "description": "Наваристый суп с бараниной и овощами"},
+  {"id": "norin", "name": "Норин", "name_uz": "Norin", "category": "main", "price": 33000, "description": "Норин с тонко нарезанным тестом и кониной"},
+  {"id": "pizza_margherita", "name": "Пицца Маргарита", "name_uz": "Margarita pitsasi", "category": "main", "price": 45000, "description": "Пицца с томатным соусом, моцареллой и базиликом, 30 см"},
+  {"id": "caesar_salad", "name": "Салат Цезарь с курицей", "name_uz": "Tovuqli Sezar salati", "category": "salad", "price": 26000, "description": "Салат цезарь с курицей гриль, пармезаном и сухариками"},
+  {"id": "pasta_carbonara", "name": "Паста Карбонара", "name_uz": "Karbonara pastasi", "category": "main", "price": 34000, "description": "Паста карбонара с беконом и сливочным соусом"},
+  {"id": "burger_beef", "name": "Бургер с говядиной", "name_uz": "Mol go'shtli burger", "category": "main", "price": 29000, "description": "Бургер с котлетой из говядины, сыром чеддер и картофелем фри"},
+  {"id": "achichuk", "name": "Ачичук", "name_uz": "Achichuq", "category": "salad", "price": 14000, "description": "Салат из свежих помидоров и лука"},
+  {"id": "non", "name": "Лепёшка", "name_uz": "Non", "category": "bread", "price": 6000, "description": "Свежая узбекская лепёшка из тандыра"},
+  {"id": "compote", "name": "Компот", "name_uz": "Kompot", "category": "drink", "price": 8000, "description": "Компот из сухофруктов, 0.5 литра"}
+]
