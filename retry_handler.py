@@ -1,22 +1,34 @@
 """Ретраит вызов LLM при rate-limit (HTTP 429) с экспоненциальной задержкой.
 
-Ставится в пайплайн прямо перед LLM-сервисом. Ошибки LLM всплывают вверх по
-пайплайну как ErrorFrame (см. FrameProcessor.push_error в pipecat) — процессор
-перед LLM первым видит такой апстрим-фрейм. Pipecat сам классифицирует причину
-ошибки в frame.category (ErrorCategory.RATE_LIMIT для 429 у любого провайдера),
-поэтому логика одинаковая для Gemini и Claude.
+Ставится в пайплайн прямо перед LLM-сервисом (между user-aggregator'ом и LLM).
+Ошибки LLM всплывают вверх по пайплайну как ErrorFrame (см.
+FrameProcessor.push_error в pipecat) — этот процессор первым видит такой
+апстрим-фрейм, поскольку стоит перед LLM. Pipecat сам классифицирует причину
+ошибки в frame.category (ErrorCategory.RATE_LIMIT для 429 у любого
+провайдера), поэтому логика одинаковая для Gemini и Claude.
 
 При обнаружении rate-limit: озвучивает клиенту фразу вроде «секунду, уточняю»
 через tts.queue_frame(), ждёт экспоненциальную задержку и повторно запускает
-LLM через pipeline_worker.queue_frame(LLMRunFrame()) — это тот же механизм,
+LLM через pipeline_worker.queue_frame(LLMRunFrame()) — тот же механизм,
 которым bot.py стартует разговор.
+
+Счётчик попыток должен сбрасываться на каждую новую реплику клиента, а не
+только при успехе (иначе одна неудачная серия ретраев "съест" лимит для всех
+следующих реплик). TranscriptionFrame для этого не годится — user-aggregator
+поглощает его и не пробрасывает дальше по пайплайну. Вместо этого ловим
+LLMContextFrame — именно его user-aggregator пускает вниз по пайплайну перед
+каждым запуском LLM, что при "органическом" ходе разговора, что при нашем
+собственном ретрае. Различаем эти два случая простым флагом: перед тем как
+самим инициировать ретрай, выставляем _retry_in_flight, и на LLMContextFrame,
+вызванном этим ретраем, флаг снимаем, не трогая счётчик; любой другой
+LLMContextFrame — это новая реплика клиента, счётчик сбрасывается.
 """
 
 import asyncio
 
 from loguru import logger
 
-from pipecat.frames.frames import ErrorFrame, Frame, LLMRunFrame, TranscriptionFrame, TTSSpeakFrame
+from pipecat.frames.frames import ErrorFrame, Frame, LLMContextFrame, LLMRunFrame, TTSSpeakFrame
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 from pipecat.services.tts_service import TTSService
 from pipecat.utils.errors import ErrorCategory
@@ -39,13 +51,17 @@ class RateLimitRetryHandler(FrameProcessor):
         self._max_retries = max_retries
         self._base_delay_secs = base_delay_secs
         self._attempt = 0
+        self._retry_in_flight = False
 
     async def process_frame(self, frame: Frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
 
-        if isinstance(frame, TranscriptionFrame):
-            # Новая реплика клиента — счётчик ретраев на предыдущий ответ больше не актуален.
-            self._attempt = 0
+        if direction == FrameDirection.DOWNSTREAM and isinstance(frame, LLMContextFrame):
+            if self._retry_in_flight:
+                self._retry_in_flight = False
+            else:
+                # Новый запуск LLM, не наш собственный ретрай — новая реплика клиента.
+                self._attempt = 0
 
         if (
             direction == FrameDirection.UPSTREAM
@@ -61,6 +77,7 @@ class RateLimitRetryHandler(FrameProcessor):
                 )
                 await self._tts.queue_frame(TTSSpeakFrame(self._retry_phrase))
                 await asyncio.sleep(delay)
+                self._retry_in_flight = True
                 await self.pipeline_worker.queue_frame(LLMRunFrame())
                 return  # не пробрасываем эту ошибку дальше вверх по пайплайну
 
