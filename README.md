@@ -9,6 +9,8 @@
 Speech (STT/TTS), Gemini или Claude (переключается в `.env`), Silero VAD с
 перебиванием.
 
+[![Tests](https://github.com/OWNER/REPO/actions/workflows/tests.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/tests.yml)
+
 ## Установка и запуск
 
 Нужен Python 3.11+.
@@ -183,3 +185,7 @@ flowchart LR
    разрешить браузеру доступ к микрофону.
 5. После разговора проверить `logs/` — там появится JSON с этим звонком, и
    `python analyze_calls.py` покажет метрики.
+
+## Лицензия
+
+[MIT](LICENSE)
