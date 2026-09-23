@@ -52,9 +52,15 @@ python bot.py -t webrtc
 ```dotenv
 BOT_LANGUAGE=ru        # или uz
 LLM_PROVIDER=gemini    # или anthropic
-GEMINI_MODEL=gemini-3.6-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
 ANTHROPIC_MODEL=claude-haiku-4-5-20251001
 ```
+
+> `gemini-3.5-flash-lite` выбран дефолтом из-за самого щедрого бесплатного
+> лимита запросов. Самая новая `gemini-3.6-flash` формально тоже бесплатна,
+> но на free-тарифе её квота намного жёстче — можно поймать `429 Too Many
+> Requests` уже на первом звонке. Актуальные лимиты — на
+> [aistudio.google.com/rate-limit](https://aistudio.google.com/rate-limit).
 
 Голос Azure для каждого языка тоже настраивается в `.env`
 (`AZURE_VOICE_RU`, `AZURE_VOICE_UZ`) — по умолчанию женские голоса

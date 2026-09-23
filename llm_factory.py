@@ -32,7 +32,7 @@ def create_llm_service(system_instruction: str) -> LLMService:
     provider = os.getenv("LLM_PROVIDER", "gemini").strip().lower()
 
     if provider == "gemini":
-        model = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+        model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
         return GoogleLLMService(
             api_key=os.environ["GOOGLE_API_KEY"],
             settings=GoogleLLMService.Settings(

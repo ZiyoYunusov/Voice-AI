@@ -41,6 +41,7 @@ class RateLimitRetryHandler(FrameProcessor):
         self,
         tts: TTSService,
         retry_phrase: str,
+        giveup_phrase: str,
         max_retries: int = 3,
         base_delay_secs: float = 1.0,
         **kwargs,
@@ -48,6 +49,7 @@ class RateLimitRetryHandler(FrameProcessor):
         super().__init__(**kwargs)
         self._tts = tts
         self._retry_phrase = retry_phrase
+        self._giveup_phrase = giveup_phrase
         self._max_retries = max_retries
         self._base_delay_secs = base_delay_secs
         self._attempt = 0
@@ -75,7 +77,10 @@ class RateLimitRetryHandler(FrameProcessor):
                     f"LLM rate limit (429), попытка {self._attempt}/{self._max_retries}, "
                     f"повтор через {delay}с: {frame.error}"
                 )
-                await self._tts.queue_frame(TTSSpeakFrame(self._retry_phrase))
+                if self._attempt == 1:
+                    # Озвучиваем только на первой попытке — иначе на серии
+                    # ретраев клиент слышит одну и ту же фразу несколько раз подряд.
+                    await self._tts.queue_frame(TTSSpeakFrame(self._retry_phrase))
                 await asyncio.sleep(delay)
                 self._retry_in_flight = True
                 await self.pipeline_worker.queue_frame(LLMRunFrame())
@@ -83,7 +88,10 @@ class RateLimitRetryHandler(FrameProcessor):
 
             logger.error(
                 f"LLM rate limit (429): превышено число попыток ({self._max_retries}), "
-                "пробрасываю ошибку дальше"
+                "сообщаю клиенту и завершаю попытки для этой реплики"
             )
+            self._attempt = 0
+            await self._tts.queue_frame(TTSSpeakFrame(self._giveup_phrase))
+            return  # тоже не пробрасываем — клиент уже получил внятный ответ
 
         await self.push_frame(frame, direction)

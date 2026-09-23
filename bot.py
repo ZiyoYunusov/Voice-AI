@@ -53,6 +53,8 @@ LANGUAGE_CONFIG = {
         "prompt_file": "system_ru.md",
         "greeting": "Здравствуйте! Это служба доставки еды. Что бы вы хотели заказать?",
         "retry_phrase": "Секунду, уточняю.",
+        "giveup_phrase": "Извините, у меня сейчас технические неполадки. "
+        "Пожалуйста, перезвоните через пару минут.",
     },
     "uz": {
         "azure_language": Language.UZ_UZ,
@@ -61,6 +63,8 @@ LANGUAGE_CONFIG = {
         "prompt_file": "system_uz.md",
         "greeting": "Assalomu alaykum! Ovqat yetkazib berish xizmati. Nima buyurtma qilmoqchisiz?",
         "retry_phrase": "Bir soniya, aniqlab olay.",
+        "giveup_phrase": "Kechirasiz, hozir texnik nosozlik yuz berdi. "
+        "Iltimos, bir necha daqiqadan so'ng qayta qo'ng'iroq qiling.",
     },
 }
 
@@ -136,7 +140,9 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments):
         user_params=LLMUserAggregatorParams(vad_analyzer=SileroVADAnalyzer()),
     )
 
-    retry_handler = RateLimitRetryHandler(tts=tts, retry_phrase=lang["retry_phrase"])
+    retry_handler = RateLimitRetryHandler(
+        tts=tts, retry_phrase=lang["retry_phrase"], giveup_phrase=lang["giveup_phrase"]
+    )
     # Два отдельных экземпляра: TranscriptionFrame не доходит дальше user_aggregator,
     # а TTSTextFrame рождается только после tts — один процессор не может стоять
     # в обеих точках пайплайна одновременно, поэтому пишем в общий call_logger из двух мест.
