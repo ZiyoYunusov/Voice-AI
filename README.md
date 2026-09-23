@@ -9,7 +9,7 @@
 Speech (STT/TTS), Gemini или Claude (переключается в `.env`), Silero VAD с
 перебиванием.
 
-[![Tests](https://github.com/OWNER/REPO/actions/workflows/tests.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/tests.yml)
+[![Tests](https://github.com/ZiyoYunusov/Voice-AI/actions/workflows/tests.yml/badge.svg)](https://github.com/ZiyoYunusov/Voice-AI/actions/workflows/tests.yml)
 
 ## Установка и запуск
 
